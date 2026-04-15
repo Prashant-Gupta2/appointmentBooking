@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Appointment Registration</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .form-container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 350px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      border-color: #4facfe;
+      box-shadow: 0 0 5px rgba(79,172,254,0.5);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #4facfe;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #00c6ff;
+    }
+    ul li{
+      list-style: none;
+      padding: 12px;
+      background-color: #8acbdc;
+      margin-top: 7px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>Appointment Form</h2>
+    
+    <form id="appointment-form">
+      <div class="input-group">
+        <label>Username</label>
+        <input type="text" id="user_name" placeholder="Enter your name" >
+      </div>
+
+      <div class="input-group">
+        <label>Phone Number</label>
+        <input type="tel" id="phone_no" placeholder="Enter phone number" >
+      </div>
+
+      <div class="input-group">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="Enter email" >
+      </div>
+
+      <button type="submit">Book Appointment</button>
+    </form>
+    <ul id="list">
+      
+    </ul>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    let userList =[]
+    const form = document.getElementById("appointment-form");
+    const list = document.getElementById("list");
+    document.addEventListener("DOMContentLoaded",()=>{
+      form.addEventListener("submit", async()=>{
+      const data ={
+          user_name: document.getElementById("user_name").value,
+          phone_no: document.getElementById("phone_no").value,
+          email :document.getElementById("email").value
+      }
+     try{
+       const res = await  axios.post("http://localhost:3000/add-user",data)
+       console.log(res);
+       alert('Appointment Booked');
+     }
+     catch(err){
+      console.log(err);
+     }
+    })
+
+    async function getUsers(){
+      try{
+        let res = await axios.get("http://localhost:3000/get-user")
+        userList = res.data;
+        console.log(userList);  
+        userList.forEach((user)=>{
+          let li = document.createElement("li");
+          li.textContent=`${user.user_name}- ${user.email}` 
+          let del_btn = document.createElement("button")
+          let edit_btn = document.createElement("button")
+          del_btn.textContent="Del";
+          edit_btn.textContent="Edit";
+          li.appendChild(del_btn);
+          li.appendChild(edit_btn);
+          list.append(li)
+        })
+        
+      }
+      catch(err){
+        console.log(err);
+      }
+    }
+    getUsers();
+    });
+    
+  </script>
+</body>
+</html>
