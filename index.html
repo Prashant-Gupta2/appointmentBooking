@@ -74,6 +74,11 @@
       margin-top: 7px;
       border-radius: 5px;
     }
+   ul button{
+      margin-top: 5px;
+      width: 100px;
+      margin-right: 5px;
+    }
   </style>
 </head>
 <body>
@@ -108,6 +113,7 @@
     let userList =[]
     const form = document.getElementById("appointment-form");
     const list = document.getElementById("list");
+ 
     document.addEventListener("DOMContentLoaded",()=>{
       form.addEventListener("submit", async()=>{
       const data ={
@@ -131,6 +137,7 @@
         userList = res.data;
         console.log(userList);  
         userList.forEach((user)=>{
+          let id = user.id;
           let li = document.createElement("li");
           li.textContent=`${user.user_name}- ${user.email}` 
           let del_btn = document.createElement("button")
@@ -140,8 +147,54 @@
           li.appendChild(del_btn);
           li.appendChild(edit_btn);
           list.append(li)
-        })
-        
+          del_btn.addEventListener("click",async ()=>{
+           try{
+            let res = await axios.delete(`http://localhost:3000/delete-user/${id}`)
+           alert('user Deleted')
+           }
+           catch(err){
+            console.log(err);
+           }
+          })
+          let isEditing = false;
+          let currentEditId = null;
+
+    edit_btn.addEventListener("click", async () => {
+    try {
+    if (!isEditing) {
+      document.getElementById("user_name").value = user.user_name;
+      document.getElementById("phone_no").value = user.phone_no;
+      document.getElementById("email").value = user.email;
+
+      currentEditId = user.id;
+      isEditing = true;
+
+      edit_btn.textContent = "Update";
+    }
+    else {
+      const data = {
+        user_name: document.getElementById("user_name").value,
+        phone_no: document.getElementById("phone_no").value,
+        email: document.getElementById("email").value
+      };
+
+      await axios.put(
+        `http://localhost:3000/update-user/${currentEditId}`,
+        data
+      );
+
+      alert("User Updated");
+
+      isEditing = false;
+      currentEditId = null;
+      edit_btn.textContent = "Edit";
+    }
+
+  } catch (err) {
+    console.log(err);
+  }
+});
+        })  
       }
       catch(err){
         console.log(err);
@@ -149,7 +202,7 @@
     }
     getUsers();
     });
-    
+  
   </script>
 </body>
 </html>
